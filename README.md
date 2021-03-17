@@ -14,6 +14,31 @@ visibility.
 
 Both `llvm-objcopy` and `objcopy` should be able to hide symbols: `objcopy --localize-hidden libgsfplayer.a`.
 
+## Usage
+
+Before calling any other functions, you'll want to call
+`GSFPlayer_init()`.
+
+Call `GSFPlayer_open(path)` to allocate and return a new
+`GSFPlayer *`. If you get `NULL`, something went wrong.
+
+You can retrieve tags with `GSFPlayer_get_tags()`, this
+returns a `const char * const *` that you can iterate over.
+
+Alternatively you can retrieve individual tags with `GSFPlayer_get_tag`.
+
+The tags should contain `length` and `fade` values, these
+will automatically get pased. You can retrieve the
+length and fade times, in milliseconds, with `GSFPlayer_get_length` and `GSFPlayer_get_fade`.
+
+By default the sample rate is 44100Hz. You can change it
+with `GSFPlayer_set_sample_rate`, which will return
+the new sample rate.
+
+Then call `GSFPlayer_render` until you've rendered
+enough audio frames, then `GSFPlayer_close` to
+free resources.
+
 
 ## Licensing
 
