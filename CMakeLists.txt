@@ -20,7 +20,7 @@ if(HAVE_NEWLOCALE AND HAVE_FREELOCALE AND HAVE_USELOCALE OR APPLE)
 	endif()
 endif()
 
-set(GSF_SOURCES
+set(MGBA_SOURCES
 	mgba/src/arm/arm.c
 	mgba/src/arm/decoder-arm.c
 	mgba/src/arm/decoder.c
@@ -86,27 +86,33 @@ set(GSF_SOURCES
 	mgba/src/gba/timer.c
 	mgba/src/gba/vfame.c
 	mgba/src/gba/video.c
+)
+
+set(PSFLIB_SOURCES
     psflib/psflib.c
     psflib/psf2fs.c
+)
+
+set(MINIZ_SOURCES
     miniz/miniz.c
-    src/gsfplayer.c)
+)
+
+set(GSFPLAYER_SOURCES src/gsfplayer.c)
+
 if(WIN32)
     list(APPEND OS_LIB ws2_32 shlwapi)
-    file(GLOB OS_SOURCES mgba/src/platform/windows/*.c)
 elseif(UNIX)
     list(APPEND OS_LIB m)
-    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-        add_definitions(-D_GNU_SOURCE)
-    endif()
-    #file(GLOB OS_SOURCES mgba/src/platform/posix/*.c)
+    #if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    #    add_definitions(-D_GNU_SOURCE)
+    #endif()
 endif()
 
 set(MINIZ_DEFS)
 list(APPEND MINIZ_DEFS MINIZ_NO_STDIO)
 list(APPEND MINIZ_DEFS MINIZ_NO_ARCHIVE_APIS)
 
-list(APPEND GSF_SOURCES ${OS_SRC})
-add_library(gsfplayer ${GSF_SOURCES})
+add_library(gsfplayer ${MGBA_SOURCES} ${PSFLIB_SOURCES} ${MINIZ_SOURCES} ${GSFPLAYER_SOURCES})
 target_link_libraries(gsfplayer PUBLIC ${OS_LIB})
 target_include_directories(gsfplayer PRIVATE mgba/include mgba/src psflib)
 set_target_properties(gsfplayer PROPERTIES COMPILE_DEFINITIONS "${FUNCTION_DEFINES};DISABLE_THREADING;M_CORE_GBA;MINIMAL_CORE=2;${MINIZ_DEFS}")
@@ -120,3 +126,5 @@ else()
     target_compile_options(gsfplayer PRIVATE -Wall -Wextra)
 endif()
 
+add_executable(gsf2wav gsf2wav.c)
+target_link_libraries(gsf2wav PRIVATE gsfplayer)
