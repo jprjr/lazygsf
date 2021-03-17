@@ -1,11 +1,16 @@
 cmake_minimum_required(VERSION 3.1)
 cmake_policy(SET CMP0063 NEW)
 
-include(CheckFunctionExists)
-
 project(gsfplayer)
 
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(GSFPLAYER_VERSION_MAJOR 0)
+set(GSFPLAYER_VERSION_MINOR 0)
+set(GSFPLAYER_VERSION_PATCH 0)
+set(GSFPLAYER_VERSION_STRING ${GSFPLAYER_VERSION_MAJOR}.${GSFPLAYER_VERSION_MINOR}.${GSFPLAYER_VERSION_PATCH})
+
+include(CheckFunctionExists)
+include(GNUInstallDirs)
+
 set(OS_LIB)
 
 check_function_exists(snprintf_l HAVE_SNPRINTF_L)
@@ -115,10 +120,16 @@ list(APPEND MINIZ_DEFS MINIZ_NO_ARCHIVE_APIS)
 add_library(gsfplayer ${MGBA_SOURCES} ${PSFLIB_SOURCES} ${MINIZ_SOURCES} ${GSFPLAYER_SOURCES})
 target_link_libraries(gsfplayer PUBLIC ${OS_LIB})
 target_include_directories(gsfplayer PRIVATE mgba/include mgba/src psflib)
+target_include_directories(gsfplayer PUBLIC
+  $<INSTALL_INTERFACE:src>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src
+)
 set_target_properties(gsfplayer PROPERTIES COMPILE_DEFINITIONS "${FUNCTION_DEFINES};DISABLE_THREADING;M_CORE_GBA;MINIMAL_CORE=2;${MINIZ_DEFS}")
 set_target_properties(gsfplayer PROPERTIES CXX_VISIBILITY_PRESET hidden)
 set_target_properties(gsfplayer PROPERTIES C_VISIBILITY_PRESET hidden)
 set_target_properties(gsfplayer PROPERTIES VISIBILITY_INLINES_HIDDEN ON)
+set_target_properties(gsfplayer PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set_target_properties(gsfplayer PROPERTIES VERSION ${GSFPLAYER_VERSION_STRING} SOVERSION ${GSFPLAYER_VERSION_MAJOR}.${GSFPLAYER_VERSION_MINOR})
 
 if(MSVC)
     target_compile_options(gsfplayer PRIVATE /W4 /WX)
@@ -128,3 +139,16 @@ endif()
 
 add_executable(gsf2wav gsf2wav.c)
 target_link_libraries(gsf2wav PRIVATE gsfplayer)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gsfplayer.pc.in ${CMAKE_BINARY_DIR}/gsfplayer.pc @ONLY)
+
+install(TARGETS gsfplayer gsf2wav
+    EXPORT gsfplayer-export
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/gsfplayer.h
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gsfplayer.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
