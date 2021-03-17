@@ -137,6 +137,26 @@ else()
     target_compile_options(gsfplayer PRIVATE -Wall -Wextra)
 endif()
 
+if(NOT BUILD_SHARED_LIBS)
+    if(NOT MSVC)
+        string(REPLACE " " ";" ORIGINAL_C_FLAGS "${CMAKE_C_FLAGS}")
+        add_custom_command(
+          TARGET gsfplayer
+          POST_BUILD
+          COMMAND
+          ${CMAKE_C_COMPILER} ${ORIGINAL_C_FLAGS} -fPIC
+          -nostartfiles -nodefaultlibs -r
+          -Wl,--whole-archive $<TARGET_FILE:gsfplayer> -Wl,--no-whole-archive
+          -o $<TARGET_FILE:gsfplayer>.o &&
+          ${CMAKE_OBJCOPY} --localize-hidden $<TARGET_FILE:gsfplayer>.o &&
+          rm -f $<TARGET_FILE:gsfplayer> &&
+          ${CMAKE_AR} cr $<TARGET_FILE:gsfplayer> $<TARGET_FILE:gsfplayer>.o &&
+          ${CMAKE_RANLIB} $<TARGET_FILE:gsfplayer>
+          VERBATIM
+        )
+    endif() # TODO find a way to do this with MSVC tools
+endif()
+
 add_executable(gsf2wav gsf2wav.c)
 target_link_libraries(gsf2wav PRIVATE gsfplayer)
 
