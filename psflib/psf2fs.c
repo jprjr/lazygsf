@@ -28,7 +28,7 @@ THE SOFTWARE.
 #include <string.h>
 #include <stdlib.h>
 
-#include <zlib.h>
+#include "../miniz/miniz.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
