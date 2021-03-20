@@ -107,9 +107,25 @@ elseif(UNIX)
 endif()
 
 if(BUILD_SHARED_LIBS)
-    set(BUILD_DEF LAZYGSF_BUILD_DLL)
+    set(BUILD_DEF LAZYGSF_BUILD_SHARED)
 else()
-    set(BUILD_DEF LAZYGSF_BUILD_STATIC)
+    if(NOT MSVC)
+        string(REPLACE " " ";" ORIGINAL_C_FLAGS "${CMAKE_C_FLAGS}")
+        add_custom_command(
+          TARGET lazygsf
+          POST_BUILD
+          COMMAND
+          ${CMAKE_C_COMPILER} ${ORIGINAL_C_FLAGS} -fPIC
+          -nostartfiles -nodefaultlibs -r
+          -Wl,--whole-archive $<TARGET_FILE:lazygsf> -Wl,--no-whole-archive
+          -o $<TARGET_FILE:lazygsf>.o &&
+          ${CMAKE_OBJCOPY} --localize-hidden $<TARGET_FILE:lazygsf>.o &&
+          rm -f $<TARGET_FILE:lazygsf> &&
+          ${CMAKE_AR} cr $<TARGET_FILE:lazygsf> $<TARGET_FILE:lazygsf>.o &&
+          ${CMAKE_RANLIB} $<TARGET_FILE:lazygsf>
+          VERBATIM
+        )
+    endif() # TODO find a way to do this with MSVC tools
 endif()
 
 add_library(lazygsf ${MGBA_SOURCES} ${LAZYGSF_SOURCES})
@@ -133,23 +149,6 @@ else()
 endif()
 
 if(NOT BUILD_SHARED_LIBS)
-    if(NOT MSVC)
-        string(REPLACE " " ";" ORIGINAL_C_FLAGS "${CMAKE_C_FLAGS}")
-        add_custom_command(
-          TARGET lazygsf
-          POST_BUILD
-          COMMAND
-          ${CMAKE_C_COMPILER} ${ORIGINAL_C_FLAGS} -fPIC
-          -nostartfiles -nodefaultlibs -r
-          -Wl,--whole-archive $<TARGET_FILE:lazygsf> -Wl,--no-whole-archive
-          -o $<TARGET_FILE:lazygsf>.o &&
-          ${CMAKE_OBJCOPY} --localize-hidden $<TARGET_FILE:lazygsf>.o &&
-          rm -f $<TARGET_FILE:lazygsf> &&
-          ${CMAKE_AR} cr $<TARGET_FILE:lazygsf> $<TARGET_FILE:lazygsf>.o &&
-          ${CMAKE_RANLIB} $<TARGET_FILE:lazygsf>
-          VERBATIM
-        )
-    endif() # TODO find a way to do this with MSVC tools
 endif()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/lazygsf.pc.in ${CMAKE_BINARY_DIR}/lazygsf.pc @ONLY)
