@@ -3,11 +3,11 @@ exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 
-Name: GSFPlayer
+Name: LazyGSF
 Description: A library to decode GSF files.
-Version: @GSFPLAYER_VERSION_STRING@
+Version: @LAZYGSF_VERSION_STRING@
 Requires:
 Requires.private:
 Cflags: -I${includedir}
-Libs: -L${libdir} -lgsfplayer
+Libs: -L${libdir} -llazygsf
 Libs.private: -lm

@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.1)
 cmake_policy(SET CMP0063 NEW)
 
-project(gsfplayer)
+project(lazygsf)
 
-set(GSFPLAYER_VERSION_MAJOR 0)
-set(GSFPLAYER_VERSION_MINOR 0)
-set(GSFPLAYER_VERSION_PATCH 0)
-set(GSFPLAYER_VERSION_STRING ${GSFPLAYER_VERSION_MAJOR}.${GSFPLAYER_VERSION_MINOR}.${GSFPLAYER_VERSION_PATCH})
+set(LAZYGSF_VERSION_MAJOR 0)
+set(LAZYGSF_VERSION_MINOR 0)
+set(LAZYGSF_VERSION_PATCH 0)
+set(LAZYGSF_VERSION_STRING ${LAZYGSF_VERSION_MAJOR}.${LAZYGSF_VERSION_MINOR}.${LAZYGSF_VERSION_PATCH})
 
 include(CheckFunctionExists)
 include(GNUInstallDirs)
@@ -93,16 +93,7 @@ set(MGBA_SOURCES
 	mgba/src/gba/video.c
 )
 
-set(PSFLIB_SOURCES
-    psflib/psflib.c
-    psflib/psf2fs.c
-)
-
-set(MINIZ_SOURCES
-    miniz/miniz.c
-)
-
-set(GSFPLAYER_SOURCES src/gsfplayer.c)
+set(LAZYGSF_SOURCES src/lazygsf.c)
 
 if(WIN32)
     list(APPEND OS_LIB ws2_32 shlwapi)
@@ -113,62 +104,55 @@ elseif(UNIX)
     #endif()
 endif()
 
-set(MINIZ_DEFS)
-list(APPEND MINIZ_DEFS MINIZ_NO_STDIO)
-list(APPEND MINIZ_DEFS MINIZ_NO_ARCHIVE_APIS)
-
-add_library(gsfplayer ${MGBA_SOURCES} ${PSFLIB_SOURCES} ${MINIZ_SOURCES} ${GSFPLAYER_SOURCES})
-target_link_libraries(gsfplayer PUBLIC ${OS_LIB})
-target_include_directories(gsfplayer PRIVATE mgba/include mgba/src psflib)
-target_include_directories(gsfplayer PUBLIC
+add_library(lazygsf ${MGBA_SOURCES} ${LAZYGSF_SOURCES})
+target_link_libraries(lazygsf PUBLIC ${OS_LIB})
+target_include_directories(lazygsf PRIVATE mgba/include mgba/src)
+target_include_directories(lazygsf PUBLIC
   $<INSTALL_INTERFACE:src>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src
 )
-set_target_properties(gsfplayer PROPERTIES COMPILE_DEFINITIONS "${FUNCTION_DEFINES};DISABLE_THREADING;M_CORE_GBA;MINIMAL_CORE=2;${MINIZ_DEFS}")
-set_target_properties(gsfplayer PROPERTIES CXX_VISIBILITY_PRESET hidden)
-set_target_properties(gsfplayer PROPERTIES C_VISIBILITY_PRESET hidden)
-set_target_properties(gsfplayer PROPERTIES VISIBILITY_INLINES_HIDDEN ON)
-set_target_properties(gsfplayer PROPERTIES POSITION_INDEPENDENT_CODE ON)
-set_target_properties(gsfplayer PROPERTIES VERSION ${GSFPLAYER_VERSION_STRING} SOVERSION ${GSFPLAYER_VERSION_MAJOR}.${GSFPLAYER_VERSION_MINOR})
+set_target_properties(lazygsf PROPERTIES COMPILE_DEFINITIONS "${FUNCTION_DEFINES};DISABLE_THREADING;M_CORE_GBA;MINIMAL_CORE=2")
+set_target_properties(lazygsf PROPERTIES CXX_VISIBILITY_PRESET hidden)
+set_target_properties(lazygsf PROPERTIES C_VISIBILITY_PRESET hidden)
+set_target_properties(lazygsf PROPERTIES VISIBILITY_INLINES_HIDDEN ON)
+set_target_properties(lazygsf PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set_target_properties(lazygsf PROPERTIES VERSION ${LAZYGSF_VERSION_STRING} SOVERSION ${LAZYGSF_VERSION_MAJOR}.${LAZYGSF_VERSION_MINOR})
 
 if(MSVC)
-    target_compile_options(gsfplayer PRIVATE /W4 /WX)
+    target_compile_options(lazygsf PRIVATE /W4 /WX)
 else()
-    target_compile_options(gsfplayer PRIVATE -Wall -Wextra)
+    target_compile_options(lazygsf PRIVATE -Wall -Wextra)
 endif()
 
 if(NOT BUILD_SHARED_LIBS)
     if(NOT MSVC)
         string(REPLACE " " ";" ORIGINAL_C_FLAGS "${CMAKE_C_FLAGS}")
         add_custom_command(
-          TARGET gsfplayer
+          TARGET lazygsf
           POST_BUILD
           COMMAND
           ${CMAKE_C_COMPILER} ${ORIGINAL_C_FLAGS} -fPIC
           -nostartfiles -nodefaultlibs -r
-          -Wl,--whole-archive $<TARGET_FILE:gsfplayer> -Wl,--no-whole-archive
-          -o $<TARGET_FILE:gsfplayer>.o &&
-          ${CMAKE_OBJCOPY} --localize-hidden $<TARGET_FILE:gsfplayer>.o &&
-          rm -f $<TARGET_FILE:gsfplayer> &&
-          ${CMAKE_AR} cr $<TARGET_FILE:gsfplayer> $<TARGET_FILE:gsfplayer>.o &&
-          ${CMAKE_RANLIB} $<TARGET_FILE:gsfplayer>
+          -Wl,--whole-archive $<TARGET_FILE:lazygsf> -Wl,--no-whole-archive
+          -o $<TARGET_FILE:lazygsf>.o &&
+          ${CMAKE_OBJCOPY} --localize-hidden $<TARGET_FILE:lazygsf>.o &&
+          rm -f $<TARGET_FILE:lazygsf> &&
+          ${CMAKE_AR} cr $<TARGET_FILE:lazygsf> $<TARGET_FILE:lazygsf>.o &&
+          ${CMAKE_RANLIB} $<TARGET_FILE:lazygsf>
           VERBATIM
         )
     endif() # TODO find a way to do this with MSVC tools
 endif()
 
-add_executable(gsf2wav gsf2wav.c)
-target_link_libraries(gsf2wav PRIVATE gsfplayer)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/lazygsf.pc.in ${CMAKE_BINARY_DIR}/lazygsf.pc @ONLY)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gsfplayer.pc.in ${CMAKE_BINARY_DIR}/gsfplayer.pc @ONLY)
-
-install(TARGETS gsfplayer gsf2wav
-    EXPORT gsfplayer-export
+install(TARGETS lazygsf
+    EXPORT lazygsf-export
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/gsfplayer.h
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/lazygsf.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gsfplayer.pc
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lazygsf.pc
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
