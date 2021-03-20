@@ -11,6 +11,8 @@ set(LAZYGSF_VERSION_STRING ${LAZYGSF_VERSION_MAJOR}.${LAZYGSF_VERSION_MINOR}.${L
 include(CheckFunctionExists)
 include(GNUInstallDirs)
 
+set(BUILD_DEF)
+
 set(OS_LIB)
 
 check_function_exists(snprintf_l HAVE_SNPRINTF_L)
@@ -104,6 +106,12 @@ elseif(UNIX)
     #endif()
 endif()
 
+if(BUILD_SHARED_LIBS)
+    set(BUILD_DEF LAZYGSF_BUILD_DLL)
+else()
+    set(BUILD_DEF LAZYGSF_BUILD_STATIC)
+endif()
+
 add_library(lazygsf ${MGBA_SOURCES} ${LAZYGSF_SOURCES})
 target_link_libraries(lazygsf PUBLIC ${OS_LIB})
 target_include_directories(lazygsf PRIVATE mgba/include mgba/src)
@@ -111,7 +119,7 @@ target_include_directories(lazygsf PUBLIC
   $<INSTALL_INTERFACE:src>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
-set_target_properties(lazygsf PROPERTIES COMPILE_DEFINITIONS "${FUNCTION_DEFINES};DISABLE_THREADING;M_CORE_GBA;MINIMAL_CORE=2;BUILD_STATIC;LAZYGSF_BUILD")
+set_target_properties(lazygsf PROPERTIES COMPILE_DEFINITIONS "${FUNCTION_DEFINES};DISABLE_THREADING;M_CORE_GBA;MINIMAL_CORE=2;BUILD_STATIC;${BUILD_DEF}")
 set_target_properties(lazygsf PROPERTIES CXX_VISIBILITY_PRESET hidden)
 set_target_properties(lazygsf PROPERTIES C_VISIBILITY_PRESET hidden)
 set_target_properties(lazygsf PROPERTIES VISIBILITY_INLINES_HIDDEN ON)

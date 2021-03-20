@@ -5,13 +5,15 @@
 #include <stddef.h>
 
 #ifdef _MSC_VER
-#ifdef LAZYGSF_BUILD
+#ifdef LAZYGSF_BUILD_STATIC
+#define LAZYGSF_EXPORT
+#elif defined(LAZYGSF_BUILD_DLL)
 #define LAZYGSF_EXPORT __declspec(dllexport)
 #else
 #define LAZYGSF_EXPORT __declspec(dllimport)
 #endif
 #else
-#if __GNUC__ >= 4 && defined(LAZYGSF_BUILD)
+#if __GNUC__ >= 4 && defined(LAZYGSF_BUILD_DLL)
 #define LAZYGSF_EXPORT __attribute__ ((visibility("default")))
 #else
 #define EXPORT
