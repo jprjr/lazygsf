@@ -4,27 +4,13 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef LAZYGSF_BUILD_SHARED
-    #ifdef __GNUC__
-      #define LAZYGSF_EXPORT __attribute__ ((dllexport))
-    #else
-      #define LAZYGSF_EXPORT __declspec(dllexport)
-    #endif
-  #else
-    #ifdef __GNUC__
-      #define LAZYGSF_EXPORT __attribute__ ((dllimport))
-    #else
-      #define LAZYGSF_EXPORT __declspec(dllimport) // Note: actually gcc seems to also supports this syntax.
-    #endif
-  #endif
+
+#if __GNUC__ >= 4
+  #define LAZYGSF_EXPORT __attribute__ ((visibility ("default")))
 #else
-  #if __GNUC__ >= 4
-    #define LAZYGSF_EXPORT __attribute__ ((visibility ("default")))
-  #else
-    #define LAZYGSF_EXPORT
-  #endif
+  #define LAZYGSF_EXPORT
 #endif
+
 
 #ifdef __cplusplus
 extern "C" {

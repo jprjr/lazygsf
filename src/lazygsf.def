@@ -1,0 +1,11 @@
+LIBRARY LAZYGSF
+EXPORTS
+	gsf_init
+	gsf_get_state_size
+	gsf_clear
+	gsf_set_sample_rate
+	gsf_get_sample_rate
+	gsf_upload_section
+	gsf_render
+	gsf_restart
+	gsf_shutdown

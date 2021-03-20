@@ -11,8 +11,6 @@ set(LAZYGSF_VERSION_STRING ${LAZYGSF_VERSION_MAJOR}.${LAZYGSF_VERSION_MINOR}.${L
 include(CheckFunctionExists)
 include(GNUInstallDirs)
 
-set(BUILD_DEF)
-
 set(OS_LIB)
 
 check_function_exists(snprintf_l HAVE_SNPRINTF_L)
@@ -107,7 +105,9 @@ elseif(UNIX)
 endif()
 
 if(BUILD_SHARED_LIBS)
-    set(BUILD_DEF LAZYGSF_BUILD_SHARED)
+    if(MSVC)
+        list(APPEND LAZYGSF_SOURCES src/lazygsf.def)
+    endif()
 else()
     if(NOT MSVC)
         string(REPLACE " " ";" ORIGINAL_C_FLAGS "${CMAKE_C_FLAGS}")
@@ -146,9 +146,6 @@ if(MSVC)
     target_compile_options(lazygsf PRIVATE /W3)
 else()
     target_compile_options(lazygsf PRIVATE -Wall -Wextra)
-endif()
-
-if(NOT BUILD_SHARED_LIBS)
 endif()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/lazygsf.pc.in ${CMAKE_BINARY_DIR}/lazygsf.pc @ONLY)
