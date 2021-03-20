@@ -109,7 +109,7 @@ target_link_libraries(lazygsf PUBLIC ${OS_LIB})
 target_include_directories(lazygsf PRIVATE mgba/include mgba/src)
 target_include_directories(lazygsf PUBLIC
   $<INSTALL_INTERFACE:src>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
 set_target_properties(lazygsf PROPERTIES COMPILE_DEFINITIONS "${FUNCTION_DEFINES};DISABLE_THREADING;M_CORE_GBA;MINIMAL_CORE=2")
 set_target_properties(lazygsf PROPERTIES CXX_VISIBILITY_PRESET hidden)
