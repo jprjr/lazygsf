@@ -12,9 +12,9 @@ If you build a static library, be aware there's a lot of symbols,
 you'll want to take some post-processing steps to limit symbol
 visibility.
 
-Both `llvm-objcopy` and `objcopy` should be able to hide symbols: `objcopy --localize-hidden libgsfplayer.a`.
+## Example Application
 
-
+See [gsf2wav](https://github.com/jprjr/gsf2wav)
 
 ## Licensing
 
