@@ -111,7 +111,7 @@ target_include_directories(lazygsf PUBLIC
   $<INSTALL_INTERFACE:src>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
-set_target_properties(lazygsf PROPERTIES COMPILE_DEFINITIONS "${FUNCTION_DEFINES};DISABLE_THREADING;M_CORE_GBA;MINIMAL_CORE=2")
+set_target_properties(lazygsf PROPERTIES COMPILE_DEFINITIONS "${FUNCTION_DEFINES};DISABLE_THREADING;M_CORE_GBA;MINIMAL_CORE=2;BUILD_STATIC;LAZYGSF_BUILD")
 set_target_properties(lazygsf PROPERTIES CXX_VISIBILITY_PRESET hidden)
 set_target_properties(lazygsf PROPERTIES C_VISIBILITY_PRESET hidden)
 set_target_properties(lazygsf PROPERTIES VISIBILITY_INLINES_HIDDEN ON)
@@ -119,7 +119,7 @@ set_target_properties(lazygsf PROPERTIES POSITION_INDEPENDENT_CODE ON)
 set_target_properties(lazygsf PROPERTIES VERSION ${LAZYGSF_VERSION_STRING} SOVERSION ${LAZYGSF_VERSION_MAJOR}.${LAZYGSF_VERSION_MINOR})
 
 if(MSVC)
-    target_compile_options(lazygsf PRIVATE /W4 /WX)
+    target_compile_options(lazygsf PRIVATE /W3)
 else()
     target_compile_options(lazygsf PRIVATE -Wall -Wextra)
 endif()

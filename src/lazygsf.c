@@ -4,21 +4,9 @@
 #include <mgba/core/blip_buf.h>
 #include <mgba/core/log.h>
 #include <mgba-util/vfs.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef _MSC_VER
-#define strncasecmp _strnicmp
-#define EXPORT __declspec(dllexport)
-#else
-#include <strings.h>
-#if __GNUC__ >= 4
-#define EXPORT __attribute__ ((visibility("default")))
-#else
-#define EXPORT
-#endif
-#endif
 
 /* buffer size in PCM frames */
 #define LAZYGSF_BUFFER_SIZE 2048
@@ -117,27 +105,27 @@ GSF_load_core(gsf_state_t *state) {
     return 0;
 }
 
-EXPORT void
+LAZYGSF_EXPORT void
 gsf_init(void) {
     mLogSetDefaultLogger(&GSF_null_logger);
 }
 
-EXPORT
+LAZYGSF_EXPORT
 size_t gsf_get_state_size(void) {
     return sizeof(gsf_state_t);
 }
 
-EXPORT
+LAZYGSF_EXPORT
 void gsf_clear(gsf_state_t *state) {
     memset(state,0,sizeof(gsf_state_t));
 }
 
-EXPORT unsigned int
+LAZYGSF_EXPORT unsigned int
 gsf_get_sample_rate(gsf_state_t *state) {
     return state->sample_rate;
 }
 
-EXPORT unsigned int
+LAZYGSF_EXPORT unsigned int
 gsf_set_sample_rate(gsf_state_t *state, unsigned int sample_rate) {
     if(state->flag) return state->sample_rate;
 
@@ -161,7 +149,7 @@ gsf_set_sample_rate(gsf_state_t *state, unsigned int sample_rate) {
     return state->sample_rate;
 }
 
-EXPORT
+LAZYGSF_EXPORT
 int gsf_upload_section(gsf_state_t *state, const uint8_t *data, size_t size) {
 /* according to gsf spec:
 Offset         Size    Description
@@ -202,7 +190,7 @@ The The High byte of the Offset should match the high byte of Entry_Point.
     return 0;
 }
 
-EXPORT int
+LAZYGSF_EXPORT int
 gsf_render(gsf_state_t *state, int16_t *buf, size_t count) {
     size_t r = 0;
     size_t n = 0;
@@ -226,7 +214,7 @@ gsf_render(gsf_state_t *state, int16_t *buf, size_t count) {
 }
 
 
-EXPORT void
+LAZYGSF_EXPORT void
 gsf_restart(gsf_state_t *state) {
     state->core->reset(state->core);
     state->buffered = 0;
@@ -235,7 +223,7 @@ gsf_restart(gsf_state_t *state) {
     blip_clear(state->core->getAudioChannel(state->core, 1));
 }
 
-EXPORT void
+LAZYGSF_EXPORT void
 gsf_shutdown(gsf_state_t *state) {
     if(state->core) {
         state->core->unloadROM(state->core);
