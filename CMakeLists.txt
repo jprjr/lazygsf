@@ -65,18 +65,19 @@ set(MGBA_SOURCES
     mgba/src/gb/audio.c
 	mgba/src/gba/audio.c
 	mgba/src/gba/bios.c
+	mgba/src/gba/cart/ereader.c
+	mgba/src/gba/cart/gpio.c
+	mgba/src/gba/cart/matrix.c
+	mgba/src/gba/cart/vfame.c
 	mgba/src/gba/cheats.c
 	mgba/src/gba/cheats/codebreaker.c
 	mgba/src/gba/cheats/gameshark.c
 	mgba/src/gba/cheats/parv3.c
 	mgba/src/gba/core.c
 	mgba/src/gba/dma.c
-	mgba/src/gba/ereader.c
 	mgba/src/gba/gba.c
-	mgba/src/gba/hardware.c
 	mgba/src/gba/hle-bios.c
 	mgba/src/gba/io.c
-	mgba/src/gba/matrix.c
 	mgba/src/gba/memory.c
 	mgba/src/gba/overrides.c
 	mgba/src/gba/renderers/cache-set.c
@@ -89,7 +90,6 @@ set(MGBA_SOURCES
 	mgba/src/gba/serialize.c
 	mgba/src/gba/sio.c
 	mgba/src/gba/timer.c
-	mgba/src/gba/vfame.c
 	mgba/src/gba/video.c
 )
 
