@@ -237,4 +237,8 @@ gsf_shutdown(gsf_state_t *state) {
     }
 }
 
+/* mgba looks for projectName and projectVersion variables, we won't use them
+ * but we need them to link */
 
+const char* projectName = "lazygsf";
+const char* projectVersion = "0";

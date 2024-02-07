@@ -89,6 +89,7 @@ set(MGBA_SOURCES
 	mgba/src/gba/savedata.c
 	mgba/src/gba/serialize.c
 	mgba/src/gba/sio.c
+	mgba/src/gba/sio/gbp.c
 	mgba/src/gba/timer.c
 	mgba/src/gba/video.c
 )
